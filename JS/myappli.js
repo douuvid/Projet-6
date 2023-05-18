@@ -227,7 +227,7 @@ var response = await fetch(url,myInit)
     }
 
     var _,result = await response.json()
-    e.log(result, result.results, result.next)
+    
     return { data: result.results,next: result.next,previous:result.previous, error: null}   // objet
 
 }
