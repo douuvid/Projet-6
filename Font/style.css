@@ -208,3 +208,20 @@ body {
       width: 70%;
     }
   }
+
+
+  #pop-id {
+    margin: 70px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    width: 30%;
+    position: absolute;
+    transition: all 5s ease-in-out;
+  }
+  
+  #pop-id {
+    margin-top: 0;
+    color: #333;
+    font-family: Tahoma, Arial, sans-serif;
+  }

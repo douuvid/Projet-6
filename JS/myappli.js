@@ -20,8 +20,6 @@ class Category{ // Creation d'une classe
             this.ok= true
             this.films= data 
             this.next = next
-
-        
             
             if(data.length< this.page_size){
                 this.index_end_film=data.length-1
@@ -32,37 +30,50 @@ class Category{ // Creation d'une classe
 
     }
 
-    display_info(){
+    
+
+
+    async display_info(url,id_pop_up){
+        
         if(!this.ok){
             console.log("CError loading category ")
             return
         }
 
-        var infos = ["directors","actors","writers","genres",]
-        
-        var div_pop_text=document.getElementById("pop_up_contener")
+        var {data, error} = await handleRequest("GET", url)
+        if (error){
+            console.log(error)
+            return
+        }
+
+        var infos = ["image_url","title","genres","date_published","rated","imdb_scrore","diretors","actors","duration","coutries","worldwide_gross_income","description"]
+        var div_pop_text=document.getElementById(id_pop_up)
         for(let info of infos){
+            if (!data[info]){
+                continue
+            }
+            if (info == "image_url"){
+                var img_film =document.createElement("img")
+                img_film.src= data[info]
+                div_pop_text.appendChild(img_film)
+                continue
+            }
+
 
             var div_pop_director=document.createElement("div")
-            div_pop_director.innerText= info + ": "+ this.films[0][info]
+            
+
+            div_pop_director.innerText= info.replaceAll("_"," ") + ": "+ data[info]
             div_pop_director.style.textTransform= "capitalize"
             div_pop_text.appendChild(div_pop_director)
 
             var espace = document.createElement("br")
 
             div_pop_text.appendChild(espace)
-
-            
-            
-
         }
-        
-        
-        
-
     }
 
-
+    
 
 
     display_best_movie(){
@@ -75,18 +86,20 @@ class Category{ // Creation d'une classe
     var img_best_movie = document.getElementById("best_movie_img")
     div_title_best_movie.innerText = this.films[0].title
     img_best_movie.src = this.films[0].image_url
-    this.display_info()
+    this.display_info(this.films[0].url,"pop_up_contener")
     this.films.shift()
     this.load_next()
 
     }
 
 
-    display(){  
+    display(){ 
+        
         if(!this.ok){
             console.log("CError loading category ")
             return
         }
+
         var div = document.getElementById("div_categorie")
         var category = document.createElement("div")
 
@@ -98,8 +111,10 @@ class Category{ // Creation d'une classe
         var div_des_carres= document.createElement("div")
         div_des_carres.className = "div_des_carres"
         div_des_carres.id = "div_des_carres_"+ this.name
+        
         category.appendChild(div_des_carres)
         this.contener = div_des_carres
+
 
         var div_arrow_left= document.createElement("div")
         div_arrow_left.style.visibility = "hidden"
@@ -111,14 +126,23 @@ class Category{ // Creation d'une classe
         for (let j = 0; j < this.page_size; j++){
 
             var carre =document.createElement("img")
-            
             carre.className = "carre"
             carre.id = this.name + "_carre_" + j// concatener string et entien se renseigner 
             carre.src= this.films[this.index_start_film +j].image_url // recup les image
+            carre.addEventListener("click", ()=>{
+                document.getElementById("pop-id").remove()
+                pop_up()
+
+                this.display_info(this.films[this.index_start_film +j].url,"pop-id")
+
+                document.getElementById("pop-id").style.display = "contents"
+
+            })
+            
             div_des_carres.appendChild(carre)
 
+
         }
-        
         
         // creation des fleches auto (la doite )
         var div_arrow_right= document.createElement("div")
@@ -203,8 +227,21 @@ class Category{ // Creation d'une classe
         console.log(error)
 
     }
+    
 }
+function pop_up(){
+    var pop_up = document.createElement("div")
+    pop_up.id="pop-id"
+    pop_up.style.display = "none"
+    var botton = document.createElement("button")
+    botton.innerText= "Quit"
+    botton.addEventListener("click", ()=>{pop_up.style.display = "none"})
+    pop_up.appendChild(botton)
+    console.log(document.html)
+    document.body.appendChild(pop_up)
 
+
+}
 
 async function handleRequest(method, url){ // on recuperer les donne de l'api
 var myHeaders = new Headers();
@@ -228,20 +265,27 @@ var response = await fetch(url,myInit)
 
     var _,result = await response.json()
     
-    return { data: result.results,next: result.next,previous:result.previous, error: null}   // objet
+    if (result.results){
+
+        return { data: result.results,next: result.next,previous:result.previous, error: null}
+
+    }else 
+        return {data: result, error:null,}
+
+   // objet
 
 }
 
 
 async function main(){
-
+    pop_up()
     var  best = new Category("Films mieux notés", "best", "http://127.0.0.1:8000/api/v1/titles/?page=1&sort_by=-imdb_score")
     await best.load()
     best.display_best_movie()
     best.display()
 
 
-    var action = new Category("Action","action","http://127.0.0.1:8000/api/v1/titles/?page=1&genre=action")
+    var action = new Category("Romance","romance","http://127.0.0.1:8000/api/v1/titles/?page=1&genre=romance")
     await action.load()
     action.display()
     
@@ -254,8 +298,6 @@ async function main(){
     drama.display()
 
     }
-
-    
 
 main()
 
