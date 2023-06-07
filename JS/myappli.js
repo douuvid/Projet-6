@@ -46,6 +46,10 @@ class Category{ // Creation d'une classe
             return
         }
 
+// Creation variable glob qui prendre en compte ce qui est en bas
+// utiiliser sa commme base d'information pour tout les films
+// FAIRE UNE FONCT 43-47 EN PARAMETRE L'URL, =>METTREE AJOUR SI BESOIN , IL VA CHERCHE LES INFO AVEC LE GET ET LE MET DANS FILM.BY_URL
+//FILM.URL {URL : THIS.FILM}
         var infos = ["image_url","title","genres","date_published","rated","imdb_scrore","diretors","actors","duration","coutries","worldwide_gross_income","description"]
         var div_pop_text=document.getElementById(id_pop_up)
         for(let info of infos){
@@ -72,8 +76,14 @@ class Category{ // Creation d'une classe
             div_pop_text.appendChild(espace)
         }
     }
+// On px utiliser la meme pop up pour affichier le contenue des film et de best story
+//faire ue fonction qui prendrait en  parametre un film (les info du film) pour afficher le contenue
+// Proposition : faire une id de film pour pouvoir mieux gerer la creation de pop up
+//passer l url des film des 
 
-    
+// Piste  : regarder si ils sont pas charger charger avant 
+// CREER UN THIS.FILM_BY_URL
+//
 
 
     display_best_movie(){
@@ -82,13 +92,13 @@ class Category{ // Creation d'une classe
             return
         }
 
-    var div_title_best_movie = document.getElementById("best_movie_title")
-    var img_best_movie = document.getElementById("best_movie_img")
-    div_title_best_movie.innerText = this.films[0].title
-    img_best_movie.src = this.films[0].image_url
-    this.display_info(this.films[0].url,"pop_up_contener")
-    this.films.shift()
-    this.load_next()
+        var div_title_best_movie = document.getElementById("best_movie_title")
+        var img_best_movie = document.getElementById("best_movie_img")
+        div_title_best_movie.innerText = this.films[0].title
+        img_best_movie.src = this.films[0].image_url
+        this.display_info(this.films[0].url,"pop_up_contener")
+        this.films.shift()
+        this.load_next()
 
     }
 
@@ -129,7 +139,9 @@ class Category{ // Creation d'une classe
             carre.className = "carre"
             carre.id = this.name + "_carre_" + j// concatener string et entien se renseigner 
             carre.src= this.films[this.index_start_film +j].image_url // recup les image
+
             carre.addEventListener("click", ()=>{
+                // creation modale dans hhtml+ css
                 document.getElementById("pop-id").remove()
                 pop_up()
 
