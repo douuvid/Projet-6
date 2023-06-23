@@ -1,3 +1,6 @@
+var modal = document.getElementById("myModal");
+var span = document.getElementsByClassName("close")[0];
+
 class Category{ // Creation d'une classe 
     constructor(title,name,url) {
         this.title= title
@@ -52,6 +55,7 @@ class Category{ // Creation d'une classe
 //FILM.URL {URL : THIS.FILM}
         var infos = ["image_url","title","genres","date_published","rated","imdb_scrore","diretors","actors","duration","coutries","worldwide_gross_income","description"]
         var div_pop_text=document.getElementById(id_pop_up)
+        div_pop_text.innerHTML = ""
         for(let info of infos){
             if (!data[info]){
                 continue
@@ -91,12 +95,23 @@ class Category{ // Creation d'une classe
             console.log("CError loading category ")
             return
         }
-
+        var button =document.getElementById("info")
+        button.onclick=()=>{
+            let id_film = document.getElementById("div_best_movie").getElementsByTagName("img")[0].id;
+            let url = "http://127.0.0.1:8000/api/v1/titles/" + id_film;
+            console.log(url)
+            
+            this.display_info(url,"modal-content")
+            console.log(modal)
+            modal.style.display = "block"}
         var div_title_best_movie = document.getElementById("best_movie_title")
         var img_best_movie = document.getElementById("best_movie_img")
+        
         div_title_best_movie.innerText = this.films[0].title
         img_best_movie.src = this.films[0].image_url
-        this.display_info(this.films[0].url,"pop_up_contener")
+        img_best_movie.id = this.films[0].id
+        
+        
         this.films.shift()
         this.load_next()
 
@@ -135,23 +150,25 @@ class Category{ // Creation d'une classe
 
         for (let j = 0; j < this.page_size; j++){
 
-            var carre =document.createElement("img")
-            carre.className = "carre"
-            carre.id = this.name + "_carre_" + j// concatener string et entien se renseigner 
-            carre.src= this.films[this.index_start_film +j].image_url // recup les image
-
-            carre.addEventListener("click", ()=>{
-                // creation modale dans hhtml+ css
-                document.getElementById("pop-id").remove()
-                pop_up()
-
-                this.display_info(this.films[this.index_start_film +j].url,"pop-id")
-
-                document.getElementById("pop-id").style.display = "contents"
-
-            })
+            var carre = document.createElement("img");
+            carre.className = "carre";
+            carre.id = this.films[this.index_start_film +j].id;// concatener string et entien se renseigner 
+            carre.src= this.films[this.index_start_film +j].image_url; // recup les image
             
-            div_des_carres.appendChild(carre)
+            div_des_carres.appendChild(carre);
+            var img = document.getElementById(carre.id);
+
+            img.addEventListener('click',function(event){
+                // creation modale dans hhtml+ css
+                
+
+                let url = "http://127.0.0.1:8000/api/v1/titles/" + event.target.id
+                console.log(url);
+                // Requete avec url
+                this.display_info(url,"modal-content");
+                 
+                modal.style.display = "block";
+            }.bind(this));
 
 
         }
@@ -185,7 +202,8 @@ class Category{ // Creation d'une classe
                 div_des_carres.children[k].style.visibility = "hidden"
 
             else  
-                div_des_carres.children[k].src = this.films[this.index_start_film +k].image_url   
+                div_des_carres.children[k].src = this.films[this.index_start_film +k].image_url  
+                div_des_carres.children[k].id = this.films[this.index_start_film +k].id  
 
         }
         
@@ -209,8 +227,9 @@ class Category{ // Creation d'une classe
                 div_des_carres.children[k].style.visibility = "visible"
 
             else  
-                div_des_carres.children[k].src = this.films[this.index_start_film +k].image_url   
 
+                div_des_carres.children[k].src = this.films[this.index_start_film +k].image_url   
+                div_des_carres.children[k].id = this.films[this.index_start_film +k].id 
         }
         
     }
@@ -241,19 +260,7 @@ class Category{ // Creation d'une classe
     }
     
 }
-function pop_up(){
-    var pop_up = document.createElement("div")
-    pop_up.id="pop-id"
-    pop_up.style.display = "none"
-    var botton = document.createElement("button")
-    botton.innerText= "Quit"
-    botton.addEventListener("click", ()=>{pop_up.style.display = "none"})
-    pop_up.appendChild(botton)
-    console.log(document.html)
-    document.body.appendChild(pop_up)
 
-
-}
 
 async function handleRequest(method, url){ // on recuperer les donne de l'api
 var myHeaders = new Headers();
@@ -290,7 +297,7 @@ var response = await fetch(url,myInit)
 
 
 async function main(){
-    pop_up()
+    
     var  best = new Category("Films mieux notés", "best", "http://127.0.0.1:8000/api/v1/titles/?page=1&sort_by=-imdb_score")
     await best.load()
     best.display_best_movie()
@@ -312,6 +319,18 @@ async function main(){
     }
 
 main()
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+// window.onclick = function(event) {
+//   if (event.target != modal) {
+//     modal.style.display = "none";
+//   }
+// }
 
 
 
