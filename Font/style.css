@@ -165,7 +165,7 @@ body {
 /* The Close Button */
 .close {
     color: #aaaaaa;
-    float: middle;
+    float: left;
     
     font-size: 28px;
     font-weight: bold;

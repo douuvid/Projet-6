@@ -316,6 +316,10 @@ async function main(){
     await drama.load()
     drama.display()
 
+    var drama = new Category("Action","action","http://127.0.0.1:8000/api/v1/titles/?page=1&genre=action")
+    await drama.load()
+    drama.display()
+
     }
 
 main()
